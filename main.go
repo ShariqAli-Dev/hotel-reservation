@@ -20,6 +20,8 @@ var config = fiber.Config{
 }
 
 func main() {
+	// new 2023-11-03 18:52:09.2691161 -0400 EDT m=+0.004815001j
+	// old 2023-11-03 18:51:41.900326 -0400 EDT m=+0.006637701
 	listenAddr := flag.String("listenAddr", ":5000", "The listen address of the API server")
 	flag.Parse()
 
@@ -41,10 +43,11 @@ func main() {
 		userHandler  = api.NewUserHandler(store.User)
 		hotelHandler = api.NewHotelHandler(store)
 		authHandler  = api.NewAuthHandler(store.User)
+		roomHandler  = api.NewRoomHandler(store)
 
 		app   = fiber.New(config)
 		auth  = app.Group("/api")
-		apiv1 = app.Group("/api/v1", middleware.JWTAuthentication)
+		apiv1 = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
 	)
 
 	// auth
@@ -62,5 +65,9 @@ func main() {
 	apiv1.Get("/hotel", hotelHandler.HandleGetHotels)
 	apiv1.Get("/hotel/:id", hotelHandler.HandleGetHotel)
 	apiv1.Get("/hotel/:id/rooms", hotelHandler.HandleGetRooms)
+
+	// room handlers
+	apiv1.Post("/room/:id/book", roomHandler.HandleBookRoom)
+
 	app.Listen(*listenAddr)
 }
