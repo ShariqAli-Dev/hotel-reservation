@@ -83,7 +83,7 @@ func (h *RoomHandler) HandleBookRoom(c *fiber.Ctx) error {
 		TillDate:      params.TillDate,
 		NumberPersons: params.NumberPersons,
 	}
-	inserted, err := h.store.BookingStore.InsertBooking(c.Context(), &booking)
+	inserted, err := h.store.Booking.InsertBooking(c.Context(), &booking)
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (h *RoomHandler) isRoomAvailableForBooking(ctx context.Context, roomID prim
 			"$gte": params.TillDate,
 		},
 	}
-	bookings, err := h.store.BookingStore.GetBookings(ctx, where)
+	bookings, err := h.store.Booking.GetBookings(ctx, where)
 	if err != nil {
 		return false, err
 	}
