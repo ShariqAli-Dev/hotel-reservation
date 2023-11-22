@@ -30,10 +30,10 @@ func (h *UserHandler) HandlePutUser(c *fiber.Ctx) error {
 	)
 	oid, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
-		return err
+		return ErrorInvalidID()
 	}
 	if err := c.BodyParser(&params); err != nil {
-		return err
+		return ErrorBadRequest()
 	}
 	filter := bson.M{"_id": oid}
 	if err := h.userStore.UpdateUser(c.Context(), filter, params); err != nil {
@@ -45,7 +45,7 @@ func (h *UserHandler) HandlePutUser(c *fiber.Ctx) error {
 func (h *UserHandler) HandleDeleteUser(c *fiber.Ctx) error {
 	userID := c.Params("id")
 	if err := h.userStore.DeleteUser(c.Context(), userID); err != nil {
-		return err
+		return ErrorBadRequest()
 	}
 	return c.JSON(map[string]string{"deleted": userID})
 }
@@ -79,7 +79,7 @@ func (h *UserHandler) HandleGetUser(c *fiber.Ctx) error {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return c.JSON(map[string]string{"error": "not found"})
 		}
-		return err
+		return ErrorResourceNotFound("user")
 	}
 	return c.JSON(user)
 }
